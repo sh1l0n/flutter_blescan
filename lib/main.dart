@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 
 void main() {
   runApp(MyApp());
@@ -47,6 +48,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
+  FlutterBlue get flutterBlue => FlutterBlue.instance;
+
 
   void _incrementCounter() {
     setState(() {
@@ -104,7 +108,20 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () {
+          print('GOING IN');
+          flutterBlue
+            .scan(timeout: Duration(milliseconds: 2000))
+            .listen((event) { 
+              print('onData: $event');
+            }, onDone: () {
+              print('onDone');
+            }, onError: (final Object object, [final StackTrace? trace]) { 
+               print('onError $object trace: $trace');
+            });
+
+          print('GOING OUT');
+        },
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
