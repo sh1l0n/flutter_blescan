@@ -25,10 +25,7 @@ dependencies:
     sdk: flutter
 
   flutter_blue: 0.8.0 
-  flutter_reactive_ble: ^3.0.0
-  permission_handler: 6.1.1
-
-
+  grouped_list: ^4.0.0
   cupertino_icons: ^1.0.2
 
 dev_dependencies:

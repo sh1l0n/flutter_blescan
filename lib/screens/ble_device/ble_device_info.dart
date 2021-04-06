@@ -1,8 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_ble/ble/ble.dart';
-import 'package:flutter_ble/ble/ble_device.dart';
+import 'package:grouped_list/grouped_list.dart';
+
+import '../../ble/ble.dart';
+import '../../ble/ble_device.dart';
+
 
 class BLEInfoScreen extends StatefulWidget {
   const BLEInfoScreen({Key? key, required this.uuid}) : super(key: key);
@@ -79,6 +82,19 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
     );
   }
 
+  Widget _buildSections(final BuildContext context) {
+    return GroupedListView<dynamic, String>(
+      elements: [{'name': 'John', 'group': 'Team A'}, {'name': 'John3', 'group': 'Team A'}, {'name': 'John2', 'group': 'Team B'},],
+      groupBy: (element) => element['group'],
+      groupSeparatorBuilder: (String groupByValue) => Text(groupByValue),
+      itemBuilder: (context, dynamic element) => Text(element['name']),
+      itemComparator: (item1, item2) => item1['name'].compareTo(item2['name']), // optional
+      useStickyGroupSeparators: true, // optional
+      floatingHeader: true, // optional
+      order: GroupedListOrder.ASC, // optional
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,12 +113,29 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
         ),
       ),
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
         color: Color(0xffababab),
         child: Column(
           children: [
             _connectionStatus(context),
+            Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height - 23 - 50,
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  if (index%2==0) {
+                    return Container(
+                      height: 120,
+                      color: Color(0xffff0000),
+                    );
+                  }
+                  return Text("ee $index");
+                }, 
+                itemCount: 100
+              ),
+            ),
           ],
         ),
       )
