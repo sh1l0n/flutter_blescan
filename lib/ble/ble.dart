@@ -6,6 +6,8 @@
 //
 
 
+import 'dart:async';
+
 import 'package:flutter_blue/flutter_blue.dart' show FlutterBlue, ScanResult;
 import 'ble_device.dart';
 
@@ -23,6 +25,7 @@ class BLEManager {
     return _singleton;
   }
 
+
   BLEManager._internal() {
     _flutterBlue.scanResults.listen((results) async {
       for (final ScanResult sr in results) {
@@ -35,7 +38,7 @@ class BLEManager {
           _devices[id] = device;
         }
       }
-      //sendToSink
+      _scanDevicesSink.add(devices.values.toList());
     });
   }
 
@@ -46,6 +49,16 @@ class BLEManager {
 
   late bool _isScanning = false;
   bool get isScanning => _isScanning;
+
+  StreamController<List<BLEDevice>> _scanDevicesController = StreamController<List<BLEDevice>>.broadcast();
+  Sink<List<BLEDevice>> get _scanDevicesSink => _scanDevicesController.sink;
+  Stream<List<BLEDevice>> get scanDevicesStream => _scanDevicesController.stream;
+
+  void dispose() async {
+    await stopScan();
+    _scanDevicesController.close();
+  }
+
 
   Future<void> startScan() async {
     if(isScanning) {
@@ -60,8 +73,8 @@ class BLEManager {
       throw BLEManagerDisabledException();
     }
 
-    await _flutterBlue.startScan();
     _isScanning = true;
+    await _flutterBlue.startScan(allowDuplicates: true);
   }
 
   Future<void> stopScan() async {

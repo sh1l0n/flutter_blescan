@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ble.dart';
+import 'package:flutter_ble/screens/ble_devices_list/ble_devices_list.dart';
 
 void main() {
   runApp(MyApp());
@@ -48,15 +48,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  void startScan() async {
-    try {
-      await BLEManager().startScan();
-    } on BLEManagerDisabledException {
-      print('oo2');
-    } on BLEManagerNotSupportedException {
-      print('oo3');
-    }
-  }
+
 
 
 
@@ -67,30 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title!),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '0',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            Container(
-              width: 300,
-              height: 80,
-              color: Color(0x22ffaa22),
-              child: TextButton(
-                  onPressed: () {
-
-                    startScan();
-
-                                    },
-                  child: Text('hello scan')),
-            ),
-          ],
-        ),
+        child: const BLEDeviceListScreen(),
       ),
     );
   }
