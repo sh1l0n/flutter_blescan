@@ -33,7 +33,19 @@ class _BLEDevicesListScreenState extends State<BLEDevicesListScreen> {
             ),
           ),
           actions: [
-            CircularProgressIndicator()
+            Center(
+              child: Container(
+              padding: EdgeInsets.only(right: 3),
+              width: 25,
+              height: 25,
+              child: FittedBox(
+                fit: BoxFit.fill,
+                child: CircularProgressIndicator.adaptive(
+                  valueColor: AlwaysStoppedAnimation(Color(0xff000000))
+                ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
