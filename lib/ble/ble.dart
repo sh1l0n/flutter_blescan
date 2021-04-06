@@ -37,7 +37,9 @@ class BLEManager {
           _devices[id] = device;
         }
       }
-      _scanDevicesSink.add(devices.values.toList());
+      if(_scanDevicesController.hasListener) {
+        _scanDevicesSink.add(devices.values.toList());
+      }
     });
   }
 

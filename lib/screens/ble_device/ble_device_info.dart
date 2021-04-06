@@ -24,28 +24,29 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
   @override
   void initState() {
     super.initState();
-    
-    bleDevice?.peripheral.device.services.listen((event) { 
-      print('service: $event');
+  
+    bleDevice?.peripheral.servicesStream.listen((final List<BLEService> services) { 
+      print('services: $services');
     });
-
+    
     bleDevice?.peripheral.connect(timeout: Duration(seconds: 3)).then((final bool isConnected) async {
-      if (isConnected) {
-        bleDevice?.peripheral.device.discoverServices();
-      }
       if (mounted) {
         setState(() {});
       }
     });
   }
 
+  @override
+  void dispose() {
+    bleDevice?.peripheral.disconnect();
+    super.dispose();
+  }
+
   Widget homeButton(final BuildContext context) {
     return BackButton(
       color: Color(0xffffffff),
       onPressed: () {
-        bleDevice?.peripheral.disconnect().then((value) {
-          Navigator.pop(context);
-        });
+        Navigator.pop(context);
       },
     );
   }
