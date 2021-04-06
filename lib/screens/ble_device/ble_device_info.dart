@@ -1,8 +1,12 @@
+//
+// Created by @sh1l0n
+//
+// Licensed by GPLv3
+//
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_ble/screens/ble_device/ble_service_card.dart';
-import 'package:grouped_list/grouped_list.dart';
 
 import '../../ble/ble.dart';
 import '../../ble/ble_device.dart';
@@ -77,6 +81,7 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
   }
 
   Widget _buildSections(final BuildContext context) {
+
    return StreamBuilder(
      initialData: List<BLEService>.empty(),
      stream: bleDevice?.peripheral.servicesStream,
@@ -87,7 +92,7 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
           height: MediaQuery.of(context).size.height - 23 - 50,
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
+              itemBuilder: (final BuildContext context, final int index) {
                 return BLEServiceCard(service: services[index]);
               }, 
               itemCount: services.length,
@@ -105,7 +110,7 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
         child: AppBar(
           backgroundColor: Color(0xff424242),
           title: Text(
-            bleDevice?.peripheral.name ?? 'N/A', 
+            bleDevice?.peripheral.id ?? 'N/A', 
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontWeight: FontWeight.w400,

@@ -105,10 +105,9 @@ class BLEConnectableDevice {
     sleep(Duration(milliseconds: 100));
     final bool isConnected = (await this.status) == BLEDeviceConnectionStatus.connected;
     if (isConnected) {
-      device.discoverServices().then((final List<BluetoothService> services) {
+      device.services.listen((final List<BluetoothService> services) {
         _services = [];
         for(final BluetoothService service in services) {
-          service.uuid.toString();
           List<BLECharacteristic> cs = [];
           for(final BluetoothCharacteristic characteristic in service.characteristics) {
             cs += [BLECharacteristic(
@@ -124,7 +123,9 @@ class BLEConnectableDevice {
           _servicesSink.add(_services);
         }
       });
-      
+
+     final x = await device.discoverServices();
+     print('x :$x');
     }
 
     return isConnected;
