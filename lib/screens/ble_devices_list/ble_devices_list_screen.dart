@@ -12,6 +12,8 @@ import 'ble_devices_list.dart';
 class BLEDevicesListScreen extends StatefulWidget {
   const BLEDevicesListScreen();
 
+  static String get route => '/';
+
   @override
   State<StatefulWidget> createState() => _BLEDevicesListScreenState();
 }

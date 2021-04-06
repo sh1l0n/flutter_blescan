@@ -1,13 +1,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_ble/ble/ble.dart';
 import 'package:flutter_ble/ble/ble_device.dart';
 
 class BLEInfoScreen extends StatefulWidget {
+  const BLEInfoScreen({Key? key, required this.id}) : super(key: key);
 
-  final BLEDevice bleDevice;
+  final String id;
+  static String get route => '/info';
 
-  const BLEInfoScreen({Key? key, required this.bleDevice}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _BLEInfoScreen();
@@ -16,12 +18,13 @@ class BLEInfoScreen extends StatefulWidget {
 
 class _BLEInfoScreen extends State<BLEInfoScreen> {
 
-  BLEDevice get bleDevice => widget.bleDevice;
+  String get id => '';
+  BLEDevice? get bleDevice => BLEManager().devices[id];
 
   @override
   void initState() {
     super.initState();
-    bleDevice.peripheral.connect(timeout: Duration(seconds: 3)).then((value) {
+    bleDevice?.peripheral.connect(timeout: Duration(seconds: 3)).then((value) {
       print('device could connect: $value');
     });
   }
@@ -43,7 +46,7 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
         child: AppBar(
           backgroundColor: Color(0xff424242),
           title: Text(
-            bleDevice.peripheral.id, 
+            bleDevice?.peripheral.id ?? 'Unknown', 
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontWeight: FontWeight.w400,
