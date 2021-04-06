@@ -6,14 +6,8 @@
 //
 
 
-import 'package:flutter_blue/flutter_blue.dart';
-import 'package:permission_handler/permission_handler.dart';
-
+import 'package:flutter_blue/flutter_blue.dart' show FlutterBlue, ScanResult;
 import 'ble_device.dart';
-
-class BLEManagerLocationPermissionException implements Exception {
-  String message() =>  'Location permission needed';
-}
 
 class BLEManagerDisabledException implements Exception {
   String message() => 'BLE toggle needs to turn on';
@@ -41,6 +35,7 @@ class BLEManager {
           _devices[id] = device;
         }
       }
+      //sendToSink
     });
   }
 
@@ -52,11 +47,7 @@ class BLEManager {
   late bool _isScanning = false;
   bool get isScanning => _isScanning;
 
-  void askForLocationPermission() async {
-    await Permission.location.request();
-  }
-
-  void startScan() async {
+  Future<void> startScan() async {
     if(isScanning) {
       return;
     }
@@ -69,15 +60,11 @@ class BLEManager {
       throw BLEManagerDisabledException();
     }
 
-    if(!(await Permission.location.isGranted)) {
-      throw BLEManagerLocationPermissionException();
-    }
-
     await _flutterBlue.startScan();
     _isScanning = true;
   }
 
-  void stopScan() async {
+  Future<void> stopScan() async {
     if (!isScanning) {
       return;
     }

@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-// ignore: import_of_legacy_library_into_null_safe
-import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_blue/flutter_blue.dart';
-
 import 'ble.dart';
-import 'ble_device.dart';
 
 void main() {
   runApp(MyApp());
@@ -54,6 +48,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  void startScan() async {
+    try {
+      await BLEManager().startScan();
+    } on BLEManagerDisabledException {
+      print('oo2');
+    } on BLEManagerNotSupportedException {
+      print('oo3');
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +83,10 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Color(0x22ffaa22),
               child: TextButton(
                   onPressed: () {
-                  BLEManager().startScan();                  },
+
+                    startScan();
+
+                                    },
                   child: Text('hello scan')),
             ),
           ],
