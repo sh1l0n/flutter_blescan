@@ -37,12 +37,16 @@ class _BLEDeviceListScreenState extends State<BLEDeviceListScreen> {
           scrollDirection: Axis.vertical,
           physics: AlwaysScrollableScrollPhysics(),
           itemBuilder: (final BuildContext c, final int index) {  
-            return BLEDeviceCard(id: data[index].peripheral.id, name: data[index].peripheral.name, rssi: data[index].rssi);
+            final id = data[index].peripheral.id;
+            return BLEDeviceCard(
+              id: id, 
+              name: data[index].peripheral.name, 
+              rssi: data[index].rssi,
+              onTap: () {
+                print('onTap: $id');
+              });
           },
           separatorBuilder: (final BuildContext c, final int index) {  
-            if (index>=data.length-1) {
-              return Container();
-            }
             return Container(height: 4);
           },
           itemCount: data.length,

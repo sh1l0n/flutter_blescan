@@ -63,8 +63,6 @@ class BLEConnectableDevice {
 class BLEDevice {
   const BLEDevice(this.rssi, this.peripheral);
   final int rssi;
-  // final String name;
-  // final String id;
   final BLEConnectableDevice peripheral;
 
   Map<String, dynamic> toJson() {
