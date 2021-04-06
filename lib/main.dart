@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+// import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -58,24 +58,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool scanning = false;
 
-  void scan() async {
+  late Map<String, BLEDevice> devices = {};
+
+  Future<void> scan() async {
     if (scanning) {
       print('is scanning');
       return;
     }
 
-    // if (!(await flutterBlue.isAvailable)) {
-    //   return;
-    // }
+    if (!(await flutterBlue.isAvailable)) {
+      //TODO: Alert ble is not avaialble on your phone
+      return;
+    }
 
-    // if (!(await flutterBlue.isOn)) {
-    //   return;
-    // }
-    //
-    // print('flutterReactiveBle.status: ${flutterReactiveBle.status} BleStatus.ready ${BleStatus.ready}');
-    // if(flutterReactiveBle.status != BleStatus.ready) {
-    //   return;
-    // }
+    if (!(await flutterBlue.isOn)) {
+      //TODO: Alert request activate bLE
+      return;
+    }
 
     scanning = true;
     bool granted = false;
@@ -84,60 +83,31 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     print('start scann!');
-    // FlutterReactiveBle().scanForDevices(
-    //     withServices: [],
-    //     scanMode: ScanMode.lowLatency).listen((device) {
-    //   //code for handling results
-    //   print('device: $device');
-    // }, onDone: () {
-    //   print('onDone');
-    // }, onError: (final Object object, [final StackTrace? st]) {
-    //   print('onbError: $object $st');
-    //   //code for handling error
-    // });
 
-    flutterBlue.startScan(timeout: Duration(seconds: 5)).then((value) {
-      print('finish scan: $value');
-      scanning = false;
-    }, onError: (final Object object, [final StackTrace? trace]) {
-      print('onError $object trace: $trace');
-    });
+    final List<ScanResult> results =
+        await flutterBlue.startScan(timeout: Duration(seconds: 5));
 
-    // flutterBlue.stopScan();
-    // .listen((event) {
-    //   print('ooo');
-    //   print('onData: $event');
-    // }, onDone: () {
-    //   print('onDone');
-    // }, onError: (final Object object, [final StackTrace? trace]) {
-    //     print('onError $object trace: $trace');
-    // }, cancelOnError: true);
+    for(final ScanResult sr in results) {
+
+      final id = sr.device.id.id;
+      final name = sr.device.name;
+      final status = await sr.device.state.first;
+      final rssi = sr.rssi;
+      final device = BLEDevice(rssi, name, id, parseLibraryStatus(status));
+
+      if (devices.containsKey(id)) {
+        devices.update(id, (value) => device);
+      } else {
+        devices[id] = device;
+      }
+    }
+    scanning = false;
   }
 
-  // void sc() {
-  //   // Start scanning
-  //   print('hello world');
-  //   flutterBlue.startScan(timeout: Duration(seconds: 4));
-
-  // // Listen to scan results
-  //   var subscription = flutterBlue.scanResults.listen((results) {
-  //     // do something with scan results
-  //     for (ScanResult r in results) {
-  //       print('${r.device.name} found! rssi: ${r.rssi}');
-  //     }
-  //   });
-
-  // // Stop scanning
-  //   flutterBlue.stopScan();
-  // }
 
   @override
   void initState() {
     super.initState();
-
-    // flutterBlue.scanResults.listen((results) {
-    //   print('scanResults. results: $results');
-    // });
   }
 
   @override
@@ -162,22 +132,61 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 80,
               color: Color(0x22ffaa22),
               child: TextButton(
-                onPressed: () {
-                  scan();
-                },
-                child: Text('hello scan')),
+                  onPressed: () {
+                    scan().then((value) {
+                      print('devices: $devices');
+                    });
+                  },
+                  child: Text('hello scan')),
             ),
           ],
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     scan();
-      //     // sc();
-      //   },
-      //   tooltip: 'Increment',
-      //   child: Icon(Icons.add),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+}
+
+enum BLEDeviceConnectionStatus {
+  connected,
+  connecting,
+  disconnected,
+  disconnecting,
+  unknown
+}
+
+BLEDeviceConnectionStatus parseLibraryStatus(final BluetoothDeviceState state) {
+  switch(state) {
+    case BluetoothDeviceState.connected:
+      return BLEDeviceConnectionStatus.connected;
+    case BluetoothDeviceState.connecting:
+      return BLEDeviceConnectionStatus.connecting;
+    case BluetoothDeviceState.disconnected:
+      return BLEDeviceConnectionStatus.disconnected;
+    case BluetoothDeviceState.disconnecting:
+      return BLEDeviceConnectionStatus.disconnecting;
+    default:
+      return BLEDeviceConnectionStatus.unknown;
+  }
+}
+
+class BLEDevice {
+  const BLEDevice(this.rssi, this.name, this.id, this.status);
+  final int rssi;
+  final String name;
+  final String id;
+  final BLEDeviceConnectionStatus status;
+
+  Map<String, dynamic> toJson() {
+    return {
+      "rssi": rssi,
+      "name": name,
+      "id": id,
+      "status": status,
+    };
+  }
+
+  @override
+  String toString() {
+    return toJson().toString();
   }
 }
