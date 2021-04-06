@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
 void main() {
@@ -49,52 +52,102 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  // late final flutterReactiveBle = ();
+
   FlutterBlue get flutterBlue => FlutterBlue.instance;
 
+  bool scanning = false;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+  void scan() async {
+    if (scanning) {
+      print('is scanning');
+      return;
+    }
+
+    // if (!(await flutterBlue.isAvailable)) {
+    //   return;
+    // }
+
+    // if (!(await flutterBlue.isOn)) {
+    //   return;
+    // }
+    //
+    // print('flutterReactiveBle.status: ${flutterReactiveBle.status} BleStatus.ready ${BleStatus.ready}');
+    // if(flutterReactiveBle.status != BleStatus.ready) {
+    //   return;
+    // }
+
+    scanning = true;
+    bool granted = false;
+    while (!granted) {
+      granted = await Permission.location.request().isGranted;
+    }
+
+    print('start scann!');
+    // FlutterReactiveBle().scanForDevices(
+    //     withServices: [],
+    //     scanMode: ScanMode.lowLatency).listen((device) {
+    //   //code for handling results
+    //   print('device: $device');
+    // }, onDone: () {
+    //   print('onDone');
+    // }, onError: (final Object object, [final StackTrace? st]) {
+    //   print('onbError: $object $st');
+    //   //code for handling error
+    // });
+
+    flutterBlue.startScan(timeout: Duration(seconds: 5)).then((value) {
+      print('finish scan: $value');
+      scanning = false;
+    }, onError: (final Object object, [final StackTrace? trace]) {
+      print('onError $object trace: $trace');
     });
+
+    // flutterBlue.stopScan();
+    // .listen((event) {
+    //   print('ooo');
+    //   print('onData: $event');
+    // }, onDone: () {
+    //   print('onDone');
+    // }, onError: (final Object object, [final StackTrace? trace]) {
+    //     print('onError $object trace: $trace');
+    // }, cancelOnError: true);
+  }
+
+  // void sc() {
+  //   // Start scanning
+  //   print('hello world');
+  //   flutterBlue.startScan(timeout: Duration(seconds: 4));
+
+  // // Listen to scan results
+  //   var subscription = flutterBlue.scanResults.listen((results) {
+  //     // do something with scan results
+  //     for (ScanResult r in results) {
+  //       print('${r.device.name} found! rssi: ${r.rssi}');
+  //     }
+  //   });
+
+  // // Stop scanning
+  //   flutterBlue.stopScan();
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // flutterBlue.scanResults.listen((results) {
+    //   print('scanResults. results: $results');
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title!),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
@@ -104,27 +157,27 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            Container(
+              width: 300,
+              height: 80,
+              color: Color(0x22ffaa22),
+              child: TextButton(
+                onPressed: () {
+                  scan();
+                },
+                child: Text('hello scan')),
+            ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print('GOING IN');
-          flutterBlue
-            .scan(timeout: Duration(milliseconds: 2000))
-            .listen((event) { 
-              print('onData: $event');
-            }, onDone: () {
-              print('onDone');
-            }, onError: (final Object object, [final StackTrace? trace]) { 
-               print('onError $object trace: $trace');
-            });
-
-          print('GOING OUT');
-        },
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     scan();
+      //     // sc();
+      //   },
+      //   tooltip: 'Increment',
+      //   child: Icon(Icons.add),
+      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
