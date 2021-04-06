@@ -24,8 +24,9 @@ class NavigatorManager extends StatelessWidget {
           });
         } else if (route == BLEInfoScreen.route) {
           return MaterialPageRoute(builder: (context) {
-            final String id = settings.arguments as String;
-            return BLEInfoScreen(id: id);
+            final String uuid = settings.arguments as String;
+            print('received id: $uuid');
+            return BLEInfoScreen(uuid: uuid);
           });       
         } else {
           return MaterialPageRoute(builder: (context) => Container());

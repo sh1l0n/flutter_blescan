@@ -12,7 +12,9 @@ import '../../ble/ble_device.dart';
 import 'ble_device_card.dart';
 
 class BLEDeviceList extends StatefulWidget {
-  const BLEDeviceList();
+  const BLEDeviceList({Key? key, required this.onTapOnDevice});
+
+  final Function onTapOnDevice;
 
   @override
   State<StatefulWidget> createState() => _BLEDeviceListState();
@@ -43,7 +45,7 @@ class _BLEDeviceListState extends State<BLEDeviceList> {
               name: data[index].peripheral.name, 
               rssi: data[index].rssi,
               onTap: () {
-                print('onTap: $id');
+                widget.onTapOnDevice(id);
               });
           },
           separatorBuilder: (final BuildContext c, final int index) {  

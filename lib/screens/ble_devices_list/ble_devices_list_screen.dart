@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import '../ble_device/ble_device_info.dart';
 import 'ble_devices_list.dart';
 
 class BLEDevicesListScreen extends StatefulWidget {
@@ -19,6 +20,10 @@ class BLEDevicesListScreen extends StatefulWidget {
 }
 
 class _BLEDevicesListScreenState extends State<BLEDevicesListScreen> {
+
+  void _navigateToDetails(final String uuid) {
+    Navigator.pushNamed(context, BLEInfoScreen.route, arguments: uuid);
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +60,9 @@ class _BLEDevicesListScreenState extends State<BLEDevicesListScreen> {
         width: double.infinity,
         height: double.infinity,
         color: Color(0xffababab),
-        child: const BLEDeviceList()
+        child: BLEDeviceList(onTapOnDevice: (final String uuid) {
+          _navigateToDetails(uuid);
+        }),
       )
     );
   }

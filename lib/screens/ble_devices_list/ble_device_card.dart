@@ -131,7 +131,7 @@ class _BLEDeviceCardState extends State<BLEDeviceCard> {
     return Container(
       height: 75,
       decoration: BoxDecoration(
-        color: isPressed ? Color(0xffa3a3a3) : Color(0xffffffff),
+        color: isPressed ? Color(0xffa3a3a3) : Color(0xffefefef),
         boxShadow: [ 
           BoxShadow(
             color: isPressed ? Color(0xff242424) : Color(0xff747474), //color of shadow
