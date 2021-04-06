@@ -2,7 +2,6 @@
 // Created by @sh1l0n
 //
 // Licensed by GPLv3
-// This file is part of lib_screen package
 //
 
 import 'package:flutter_blue/flutter_blue.dart' show BluetoothDeviceState, BluetoothDevice;

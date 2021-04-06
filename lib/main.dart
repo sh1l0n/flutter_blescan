@@ -1,3 +1,9 @@
+//
+// Created by @sh1l0n
+//
+// Licensed by GPLv3
+//
+
 import 'package:flutter/material.dart';
 import 'package:flutter_ble/screens/ble_devices_list/ble_devices_list.dart';
 
@@ -47,8 +53,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-
 
 
 

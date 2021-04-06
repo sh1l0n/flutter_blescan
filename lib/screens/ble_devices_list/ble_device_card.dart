@@ -1,3 +1,8 @@
+//
+// Created by @sh1l0n
+//
+// Licensed by GPLv3
+//
 
 import 'package:flutter/widgets.dart';
 
@@ -13,14 +18,103 @@ class BLEDeviceCard extends StatelessWidget {
   final String name;
   final int rssi;
 
+  Color rssiColor() {
+    final abs = rssi.abs();
+    if (abs<60) {
+      return Color(0xff00ee00);
+    } else if (abs<90) {
+      return Color(0xffeeee00);
+    } else {
+      return Color(0xffee0000);
+    }
+  }
+
+  Color rssiTextColor() {
+    final abs = rssi.abs();
+    if (abs<60) {
+      return Color(0xff121212);
+    } else if (abs<90) {
+      return Color(0xff121212);
+    } else {
+      return Color(0xffefefef);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50,
-      color: Color(0xffff0000),
-      child: Text(
-        'id $id name: $name rssi $rssi'
+      height: 75,
+      decoration: BoxDecoration(
+        color: Color(0xffffffff),
+        boxShadow: [ 
+          BoxShadow(
+            color: Color(0xff747474), //color of shadow
+            spreadRadius: 2, //spread radius
+            blurRadius: 3, // blur radius
+            offset: Offset(0, 1), // changes position of shadow
+          ),
+        ],
       ),
+      child: Row(
+        children: [
+          // header
+          Container(
+            width: 62,
+            height: 75,
+            child: Center(
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(25)),
+                  color: rssiColor(),
+                ),
+                child: Center(
+                  child: Text(rssi.toString()),
+                ),
+              ),
+            ),
+          ),
+          //separator
+          Container(
+            width: 6,
+            height: 75,
+            child: Center(
+              child: Container(
+                width: 1,
+                height: 60,
+                color: Color(0xff000000),
+              ),
+            ),
+          ),
+          //separator margin (the same as circle)
+          Container(width: 6),
+          //text (mac and name)
+          Container(
+            width: MediaQuery.of(context).size.width - 75 - 6,
+            height: 75,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    name.isEmpty ? 'N/A' : name,
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    id.isEmpty ? 'N/A' : id,
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      )
     );
   }
   
