@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
+import 'ble.dart';
+import 'ble_device.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -50,65 +53,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
-  // late final flutterReactiveBle = ();
-
-  FlutterBlue get flutterBlue => FlutterBlue.instance;
-
-  bool scanning = false;
-
-  late Map<String, BLEDevice> devices = {};
-
-  Future<void> scan() async {
-    if (scanning) {
-      print('is scanning');
-      return;
-    }
-
-    if (!(await flutterBlue.isAvailable)) {
-      //TODO: Alert ble is not avaialble on your phone
-      return;
-    }
-
-    if (!(await flutterBlue.isOn)) {
-      //TODO: Alert request activate bLE
-      return;
-    }
-
-    scanning = true;
-    bool granted = false;
-    while (!granted) {
-      granted = await Permission.location.request().isGranted;
-    }
-
-    print('start scann!');
-
-    final List<ScanResult> results =
-        await flutterBlue.startScan(timeout: Duration(seconds: 5));
-
-    for(final ScanResult sr in results) {
-
-      final id = sr.device.id.id;
-      final name = sr.device.name;
-      final status = await sr.device.state.first;
-      final rssi = sr.rssi;
-      final device = BLEDevice(rssi, name, id, parseLibraryStatus(status));
-
-      if (devices.containsKey(id)) {
-        devices.update(id, (value) => device);
-      } else {
-        devices[id] = device;
-      }
-    }
-    scanning = false;
-  }
-
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '$_counter',
+              '0',
               style: Theme.of(context).textTheme.headline4,
             ),
             Container(
@@ -133,60 +78,12 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Color(0x22ffaa22),
               child: TextButton(
                   onPressed: () {
-                    scan().then((value) {
-                      print('devices: $devices');
-                    });
-                  },
+                  BLEManager().startScan();                  },
                   child: Text('hello scan')),
             ),
           ],
         ),
       ),
     );
-  }
-}
-
-enum BLEDeviceConnectionStatus {
-  connected,
-  connecting,
-  disconnected,
-  disconnecting,
-  unknown
-}
-
-BLEDeviceConnectionStatus parseLibraryStatus(final BluetoothDeviceState state) {
-  switch(state) {
-    case BluetoothDeviceState.connected:
-      return BLEDeviceConnectionStatus.connected;
-    case BluetoothDeviceState.connecting:
-      return BLEDeviceConnectionStatus.connecting;
-    case BluetoothDeviceState.disconnected:
-      return BLEDeviceConnectionStatus.disconnected;
-    case BluetoothDeviceState.disconnecting:
-      return BLEDeviceConnectionStatus.disconnecting;
-    default:
-      return BLEDeviceConnectionStatus.unknown;
-  }
-}
-
-class BLEDevice {
-  const BLEDevice(this.rssi, this.name, this.id, this.status);
-  final int rssi;
-  final String name;
-  final String id;
-  final BLEDeviceConnectionStatus status;
-
-  Map<String, dynamic> toJson() {
-    return {
-      "rssi": rssi,
-      "name": name,
-      "id": id,
-      "status": status,
-    };
-  }
-
-  @override
-  String toString() {
-    return toJson().toString();
   }
 }
