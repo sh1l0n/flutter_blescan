@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_ble/screens/ble_device/ble_service_card.dart';
 import 'package:grouped_list/grouped_list.dart';
 
 import '../../ble/ble.dart';
@@ -13,10 +14,8 @@ class BLEInfoScreen extends StatefulWidget {
   final String uuid;
   static String get route => '/info';
 
-
   @override
   State<StatefulWidget> createState() => _BLEInfoScreen();
-
 }
 
 class _BLEInfoScreen extends State<BLEInfoScreen> {
@@ -26,12 +25,7 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
 
   @override
   void initState() {
-    super.initState();
-  
-    bleDevice?.peripheral.servicesStream.listen((final List<BLEService> services) { 
-      print('services: $services');
-    });
-    
+    super.initState();    
     bleDevice?.peripheral.connect(timeout: Duration(seconds: 3)).then((final bool isConnected) async {
       if (mounted) {
         setState(() {});
@@ -83,16 +77,24 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
   }
 
   Widget _buildSections(final BuildContext context) {
-    return GroupedListView<dynamic, String>(
-      elements: [{'name': 'John', 'group': 'Team A'}, {'name': 'John3', 'group': 'Team A'}, {'name': 'John2', 'group': 'Team B'},],
-      groupBy: (element) => element['group'],
-      groupSeparatorBuilder: (String groupByValue) => Text(groupByValue),
-      itemBuilder: (context, dynamic element) => Text(element['name']),
-      itemComparator: (item1, item2) => item1['name'].compareTo(item2['name']), // optional
-      useStickyGroupSeparators: true, // optional
-      floatingHeader: true, // optional
-      order: GroupedListOrder.ASC, // optional
-    );
+   return StreamBuilder(
+     initialData: List<BLEService>.empty(),
+     stream: bleDevice?.peripheral.servicesStream,
+     builder: (final BuildContext context, final AsyncSnapshot<List<BLEService>> snp) {
+        final services = snp.data ?? [];
+        return Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height - 23 - 50,
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return BLEServiceCard(service: services[index]);
+              }, 
+              itemCount: services.length,
+            ),
+          );
+     }
+  );
   }
 
   @override
@@ -119,23 +121,7 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
         child: Column(
           children: [
             _connectionStatus(context),
-            Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height - 23 - 50,
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  if (index%2==0) {
-                    return Container(
-                      height: 120,
-                      color: Color(0xffff0000),
-                    );
-                  }
-                  return Text("ee $index");
-                }, 
-                itemCount: 100
-              ),
-            ),
+            _buildSections(context),
           ],
         ),
       )
