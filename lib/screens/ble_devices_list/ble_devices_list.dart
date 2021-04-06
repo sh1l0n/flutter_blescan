@@ -11,14 +11,14 @@ import '../../ble/ble_device.dart';
 
 import 'ble_device_card.dart';
 
-class BLEDeviceListScreen extends StatefulWidget {
-  const BLEDeviceListScreen();
+class BLEDeviceList extends StatefulWidget {
+  const BLEDeviceList();
 
   @override
-  State<StatefulWidget> createState() => _BLEDeviceListScreenState();
+  State<StatefulWidget> createState() => _BLEDeviceListState();
 }
 
-class _BLEDeviceListScreenState extends State<BLEDeviceListScreen> {
+class _BLEDeviceListState extends State<BLEDeviceList> {
 
   @override
   void initState() {
