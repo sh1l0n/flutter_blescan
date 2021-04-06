@@ -47,6 +47,8 @@ class BLEConnectableDevice {
     await device
       .connect(autoConnect: false)
       .timeout(timeout ?? Duration(seconds: 3), onTimeout: () {});
+
+    status = await this.status;
     return status == BLEDeviceConnectionStatus.connected;
   }
 
@@ -62,7 +64,7 @@ class BLEConnectableDevice {
     catch (e) {
       return false;
     }
-    status = parseLibraryStatus(await this.device.state.first);
+    status = await this.status;
     return status == BLEDeviceConnectionStatus.disconnected;
   }
 }

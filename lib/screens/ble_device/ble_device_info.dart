@@ -24,10 +24,18 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
   @override
   void initState() {
     super.initState();
-    print('uuid: $uuid bleDevice: $bleDevice');
-    print('devices: ${BLEManager().devices}');
-    bleDevice?.peripheral.connect(timeout: Duration(seconds: 3)).then((value) {
-      setState(() {});
+    
+    bleDevice?.peripheral.device.services.listen((event) { 
+      print('service: $event');
+    });
+
+    bleDevice?.peripheral.connect(timeout: Duration(seconds: 3)).then((final bool isConnected) async {
+      if (isConnected) {
+        bleDevice?.peripheral.device.discoverServices();
+      }
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -78,7 +86,7 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
         child: AppBar(
           backgroundColor: Color(0xff424242),
           title: Text(
-            uuid, 
+            bleDevice?.peripheral.name ?? 'N/A', 
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontWeight: FontWeight.w400,
