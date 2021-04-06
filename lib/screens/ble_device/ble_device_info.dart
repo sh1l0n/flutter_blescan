@@ -27,7 +27,7 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
     print('uuid: $uuid bleDevice: $bleDevice');
     print('devices: ${BLEManager().devices}');
     bleDevice?.peripheral.connect(timeout: Duration(seconds: 3)).then((value) {
-      print('device could connect: $value');
+      setState(() {});
     });
   }
 
@@ -35,8 +35,38 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
     return BackButton(
       color: Color(0xffffffff),
       onPressed: () {
-        Navigator.pop(context);
+        bleDevice?.peripheral.disconnect().then((value) {
+          Navigator.pop(context);
+        });
       },
+    );
+  }
+
+  String _connecionStatusToString(final BLEDeviceConnectionStatus? o) {
+    switch(o) {
+      case BLEDeviceConnectionStatus.connected: return 'connected';
+      case BLEDeviceConnectionStatus.connecting: return 'connecting';
+      case BLEDeviceConnectionStatus.disconnecting: return 'disconnecting';
+      case BLEDeviceConnectionStatus.disconnected: return 'disconnected';
+      default: return 'connecting';
+    }
+  }
+
+  Widget _connectionStatus(final BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 23,
+      color: Color(0xff242424),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+        child: FutureBuilder(
+        initialData: BLEDeviceConnectionStatus.disconnected,
+        future: bleDevice?.peripheral.status,
+        builder: (final BuildContext c, final AsyncSnapshot<BLEDeviceConnectionStatus> snp) {
+          final state = _connecionStatusToString(snp.data);
+          return Text('Status: $state', style: TextStyle(color: Color(0xffefefef), fontSize: 15));
+        }),
+      ),
     );
   }
 
@@ -61,6 +91,11 @@ class _BLEInfoScreen extends State<BLEInfoScreen> {
         width: double.infinity,
         height: double.infinity,
         color: Color(0xffababab),
+        child: Column(
+          children: [
+            _connectionStatus(context),
+          ],
+        ),
       )
     );
   }
