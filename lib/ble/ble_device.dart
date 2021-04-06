@@ -36,7 +36,7 @@ class BLEConnectableDevice {
   String get name => device.name;
   String get id => device.id.id;
 
-  Future<BLEDeviceConnectionStatus> get status async => parseLibraryStatus(await this.device.state.first);
+  Future<BLEDeviceConnectionStatus> get status async => parseLibraryStatus(await device.state.first);
 
   Future<bool> connect({Duration? timeout}) async {
     BLEDeviceConnectionStatus status = await this.status;
@@ -44,7 +44,9 @@ class BLEConnectableDevice {
         status == BLEDeviceConnectionStatus.connecting) {
       return false;
     }
-    await this.device.connect(timeout: timeout ?? Duration(seconds: 3));
+    await device
+      .connect(autoConnect: false)
+      .timeout(timeout ?? Duration(seconds: 3), onTimeout: () {});
     return status == BLEDeviceConnectionStatus.connected;
   }
 
@@ -54,7 +56,12 @@ class BLEConnectableDevice {
         status == BLEDeviceConnectionStatus.disconnecting) {
       return false;
     }
-    await this.device.disconnect();
+    try {
+      await this.device.disconnect();
+    }
+    catch (e) {
+      return false;
+    }
     status = parseLibraryStatus(await this.device.state.first);
     return status == BLEDeviceConnectionStatus.disconnected;
   }
